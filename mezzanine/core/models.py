@@ -7,6 +7,7 @@ from django.utils.html import strip_tags
 from django.utils.timesince import timesince
 from django.utils.timezone import now
 from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils.encoding import smart_text
 
 from mezzanine.core.fields import RichTextField
 from mezzanine.core.managers import DisplayableManager, CurrentSiteManager
@@ -82,6 +83,13 @@ class Slugged(SiteRelated):
             slug_qs = concrete_model.objects.exclude(id=self.id)
             self.slug = unique_slug(slug_qs, "slug", self.slug)
         for_all_languages(make_slug)
+
+        # Work around:
+        # IntegrityError: pages_page.title_CURLANG may not be NULL
+        def fix_null_fields():
+            self.title = smart_text(self.title)
+        for_all_languages(fix_null_fields)
+
         super(Slugged, self).save(*args, **kwargs)
 
     def get_slug(self):
@@ -124,6 +132,13 @@ class MetaData(models.Model):
             def make_description():
                 self.description = strip_tags(self.description_from_content())
             for_all_languages(make_description)
+
+        # Work around:
+        # IntegrityError: pages_page.keywords_string_CURLANG may not be NULL
+        def fix_null_fields():
+            self.keywords_string = smart_text(self.keywords_string)
+        for_all_languages(fix_null_fields)
+
         super(MetaData, self).save(*args, **kwargs)
 
     def meta_title(self):
