@@ -570,7 +570,10 @@ def dashboard_column(context, token):
     """
     column_index = int(token.split_contents()[1])
     output = []
-    for tag in settings.DASHBOARD_TAGS[column_index]:
-        t = Template("{%% load %s %%}{%% %s %%}" % tuple(tag.split(".")))
-        output.append(t.render(Context(context)))
+    try:
+        for tag in settings.dashboard_tags[column_index]:
+            t = template("{%% load %s %%}{%% %s %%}" % tuple(tag.split(".")))
+            output.append(t.render(context(context)))
+    except IndexError:
+        pass
     return "".join(output)
