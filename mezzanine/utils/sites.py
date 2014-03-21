@@ -56,6 +56,10 @@ def current_site_id():
     return site_id
 
 
+def current_site_id():
+    return settings.SITE_ID
+
+
 def has_site_permission(user):
     """
     Checks if a staff user has staff-level access for the current site.
