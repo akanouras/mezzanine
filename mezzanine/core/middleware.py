@@ -286,6 +286,10 @@ class LocaleURLMiddleware(object):
         language active. Otherwise try to reverse the current view for all
         languages. If all fails, just replace language prefix in request.path.
         """
+
+        if response.context_data is None:
+            return response  # Probably an API call.
+
         languages_urls = []
         for (code, name) in settings.LANGUAGES:
             with override(code):
